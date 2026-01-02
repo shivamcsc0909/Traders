@@ -1,38 +1,71 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import {
+  products,
+  contacts,
+  type InsertProduct,
+  type InsertContact,
+  type Product,
+  type Contact
+} from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getProducts(): Promise<Product[]>;
+  getProduct(id: number): Promise<Product | undefined>;
+  createContact(contact: InsertContact): Promise<Contact>;
+  seedProducts(): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getProducts(): Promise<Product[]> {
+    return await db.select().from(products);
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getProduct(id: number): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createContact(contact: InsertContact): Promise<Contact> {
+    const [newContact] = await db.insert(contacts).values(contact).returning();
+    return newContact;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async seedProducts(): Promise<void> {
+    const existing = await this.getProducts();
+    if (existing.length === 0) {
+      await db.insert(products).values([
+        {
+          title: "Technical Analysis Masterclass",
+          description: "Complete guide to chart patterns and indicators.",
+          price: 49.99,
+          category: "book",
+          imageUrl: "https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&q=80&w=800",
+        },
+        {
+          title: "Forex Trading Strategies",
+          description: "Proven strategies for the currency markets.",
+          price: 39.99,
+          category: "book",
+          imageUrl: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?auto=format&fit=crop&q=80&w=800",
+        },
+        {
+          title: "Risk Management Calculator",
+          description: "Essential tool for position sizing and risk control.",
+          price: 19.99,
+          category: "tool",
+          imageUrl: "https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&q=80&w=800",
+        },
+        {
+          title: "Market Sentiment Indicator",
+          description: "Gauge the mood of the market in real-time.",
+          price: 29.99,
+          category: "tool",
+          imageUrl: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=800",
+        }
+      ]);
+    }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
