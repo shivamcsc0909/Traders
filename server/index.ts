@@ -1,7 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import { createServer } from "http";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
@@ -74,7 +79,13 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
-    serveStatic(app);
+    const publicPath = path.resolve(__dirname, "public");
+    app.use(express.static(publicPath));
+
+    app.get("*", (_req, res) => {
+      res.setHeader("Content-Type", "text/html");
+      res.sendFile(path.join(publicPath, "index.html"));
+    });
   } else {
     const { setupVite } = await import("./vite");
     await setupVite(httpServer, app);
