@@ -395,7 +395,7 @@ export default function Home() {
                 </div>
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-4">{n.cat}</div>
-                  <h3 className="text-xl font-bold mb-8 leading-snug group-hover:text-blue-400 transition-colors">{n.title}</h3>
+                  <h3 className="text-xl font-bold mb-8 leading-snug text-white group-hover:text-blue-400 transition-colors">{n.title}</h3>
                   <div className="mt-auto">
                     <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded text-xs transition-all uppercase tracking-widest">
                       Full Analysis

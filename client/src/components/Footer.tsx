@@ -8,9 +8,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-white">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
-                <BarChart2 className="h-5 w-5" />
-              </div>
+              <img src="/techforex_logo.webp" alt="TechForex" className="h-10 w-auto object-contain" />
               <span className="text-xl font-bold font-display">TechForex</span>
             </div>
             <p className="text-sm leading-relaxed text-slate-400">
